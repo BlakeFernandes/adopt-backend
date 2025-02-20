@@ -68,6 +68,23 @@ describe('PuppiesService', () => {
     expect(service).toBeDefined();
   });
 
+  describe('findOne', () => {
+    it('should return a puppy by id', async () => {
+      const firstPuppy = await puppyModel.findOne({}).exec();
+
+      expect(firstPuppy).toBeDefined();
+
+      if (!firstPuppy) throw new Error('No puppies found');
+
+      const puppy = await service.findOne(firstPuppy._id.toString());
+
+      if (!puppy) throw new Error('No puppy found');
+
+      expect(puppy).toBeDefined();
+      expect(puppy.name).toBe(firstPuppy.name);
+    });
+  });
+
   describe('findAll', () => {
     it('should return all puppies without filters', async () => {
       const result = await service.findAll({});

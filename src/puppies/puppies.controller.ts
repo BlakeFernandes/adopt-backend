@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Query,
   UsePipes,
   ValidationPipe,
@@ -42,5 +43,11 @@ export class PuppiesController {
   @Get('filters')
   getFilters(): Promise<FilterOptions> {
     return this.puppiesService.getFilters();
+  }
+
+  @Get(':id')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  findOne(@Param('id') id: string): Promise<Puppy | null> {
+    return this.puppiesService.findOne(id);
   }
 }

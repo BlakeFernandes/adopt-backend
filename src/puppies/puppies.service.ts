@@ -45,6 +45,10 @@ export class PuppiesService {
     return { breeds };
   }
 
+  async findOne(id: string): Promise<Puppy | null> {
+    return this.puppyModel.findById(id).exec();
+  }
+
   async seedData(data: Puppy[]): Promise<void> {
     await this.puppyModel.deleteMany({});
     await this.puppyModel.insertMany(data);
