@@ -2,7 +2,7 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Model } from 'mongoose';
-import { Puppy, PuppySchema } from './puppies.dto';
+import { Puppy, PuppySchema } from '../database/puppies.dto';
 import { PuppiesService } from './puppies.service';
 
 describe('PuppiesService', () => {

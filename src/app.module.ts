@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PuppiesModule } from './puppies/puppies.module';
 
 import * as dotenv from 'dotenv';
+import { AdoptModule as AdoptersModule } from './adopters/adopters.module';
+import { DatabaseModule } from './database/database.module';
 
 dotenv.config();
 
@@ -18,7 +20,6 @@ function checkRequiredEnvVars() {
 
 @Module({
   imports: [
-    PuppiesModule,
     MongooseModule.forRootAsync({
       useFactory: () => {
         checkRequiredEnvVars();
@@ -28,6 +29,9 @@ function checkRequiredEnvVars() {
         };
       },
     }),
+    DatabaseModule,
+    PuppiesModule,
+    AdoptersModule,
   ],
   providers: [],
 })

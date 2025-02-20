@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional } from 'class-validator';
-import { Puppy } from './puppies.dto';
+import { Puppy } from '../database/puppies.dto';
 import { FilterOptions, PuppiesService } from './puppies.service';
 
 export class FindAllDto {

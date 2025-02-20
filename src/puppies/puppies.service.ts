@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { Puppy } from './puppies.dto';
+import { Puppy } from '../database/puppies.dto';
 
 export type SearchFilter = {
   search?: string;
