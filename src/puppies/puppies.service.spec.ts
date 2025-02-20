@@ -9,11 +9,12 @@ describe('PuppiesService', () => {
   let service: PuppiesService;
   let puppyModel: Model<Puppy>;
   let mongod: MongoMemoryServer;
+  let module: TestingModule;
 
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create();
 
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       imports: [
         MongooseModule.forRootAsync({
           useFactory: () => ({
@@ -31,6 +32,7 @@ describe('PuppiesService', () => {
 
   afterAll(async () => {
     // Stop the in-memory MongoDB server and close the connection
+    await module.close();
     await mongod.stop();
   });
 
