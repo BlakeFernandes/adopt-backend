@@ -1,10 +1,46 @@
-import { Controller, Get } from '@nestjs/common';
-import { puppyData } from './puppies.data';
+import {
+  Controller,
+  Get,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional } from 'class-validator';
+import { Puppy } from './puppies.dto';
+import { FilterOptions, PuppiesService } from './puppies.service';
+
+export class FindAllDto {
+  @IsOptional()
+  search?: string;
+
+  @IsOptional()
+  breed?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  age?: number;
+
+  @IsOptional()
+  size?: string;
+
+  @IsOptional()
+  gender?: string;
+}
 
 @Controller('puppies')
 export class PuppiesController {
+  constructor(private readonly puppiesService: PuppiesService) {}
+
   @Get()
-  findAll() {
-    return puppyData;
+  @UsePipes(new ValidationPipe({ transform: true }))
+  findAll(@Query() query: FindAllDto): Promise<Puppy[]> {
+    return this.puppiesService.findAll(query);
+  }
+
+  @Get('filters')
+  getFilters(): Promise<FilterOptions> {
+    return this.puppiesService.getFilters();
   }
 }
