@@ -15,9 +15,11 @@ import {
   IsBoolean,
   IsEnum,
   IsInt,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
 } from 'class-validator';
 import { Puppy } from '../database/puppies.dto';
 import { FilterOptions, PuppiesService } from './puppies.service';
@@ -39,6 +41,8 @@ export class FindAllDto {
 
 export class CreatePuppyDto {
   @IsString({ message: 'Name is required' })
+  @IsNotEmpty({ message: 'Name is required' })
+  @Matches(/\S/, { message: 'Name cannot contain only spaces' })
   name: string;
   @IsNumber({}, { message: 'Age is required' })
   age: number;
@@ -51,6 +55,8 @@ export class CreatePuppyDto {
   @IsEnum(['small', 'medium', 'large'], { message: 'Size is required' })
   size: string;
   @IsString({ message: 'Breed is required' })
+  @IsNotEmpty({ message: 'Breed is required' })
+  @Matches(/\S/, { message: 'Breed cannot contain only spaces' })
   breed: string;
   @IsOptional()
   traits: string[];

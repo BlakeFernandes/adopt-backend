@@ -6,21 +6,26 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { Puppy } from 'src/database/puppies.dto';
 import { AdoptersService } from './adopters.service';
 
 export class AdoptDto {
   @IsNotEmpty({ message: 'Name is required' })
+  @Matches(/\S/, { message: 'Name cannot contain only spaces' })
   name: string;
 
   @IsEmail({}, { message: 'Email is not valid' })
   email: string;
 
   @IsString({ message: 'Phone number is not valid' })
+  @IsNotEmpty({ message: 'Phone cannot be empty' })
+  @Matches(/\S/, { message: 'Key cannot contain only spaces' })
   phone: string;
 
+  @IsString({ message: 'Message is not valid' })
   @IsNotEmpty({ message: 'Message is required' })
+  @Matches(/\S/, { message: 'Key cannot contain only spaces' })
   message: string;
 }
 
