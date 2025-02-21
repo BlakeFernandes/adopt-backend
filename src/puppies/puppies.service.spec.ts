@@ -42,24 +42,36 @@ describe('PuppiesService', () => {
     await puppyModel.insertMany([
       {
         name: 'Buddy',
-        breed: 'golden retriever',
         age: 2,
-        size: 'large',
         gender: 'male',
+        isVaccinated: true,
+        isNeutered: false,
+        size: 'large',
+        breed: 'golden retriever',
+        traits: ['Friendly', 'Playful'],
+        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
       },
       {
         name: 'Max',
-        breed: 'german shepherd',
         age: 3,
-        size: 'large',
         gender: 'male',
+        isVaccinated: true,
+        isNeutered: true,
+        size: 'large',
+        breed: 'german shepherd',
+        traits: ['Loyal', 'Intelligent'],
+        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
       },
       {
         name: 'Tommy',
-        breed: 'GREYHOUND',
         age: 2,
-        size: 'large',
         gender: 'male',
+        isVaccinated: false,
+        isNeutered: true,
+        size: 'large',
+        breed: 'GREYHOUND',
+        traits: ['Fast runner', 'Gentle indoors'],
+        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
       },
     ]);
   });
@@ -115,6 +127,70 @@ describe('PuppiesService', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('Buddy');
+    });
+  });
+
+  describe('create', () => {
+    it('should create a new puppy', async () => {
+      const newPuppy = await service.create({
+        name: 'Luna',
+        age: 1,
+        gender: 'Female',
+        isVaccinated: true,
+        isNeutered: false,
+        size: 'small',
+        breed: 'golden retriever',
+        traits: ['Friendly', 'Playful'],
+        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
+      });
+
+      expect(newPuppy).toBeDefined();
+      expect(newPuppy.name).toBe('Luna');
+      expect(newPuppy.age).toBe(1);
+    });
+  });
+
+  describe('update', () => {
+    it('should update a puppy', async () => {
+      const firstPuppy = await puppyModel.findOne({}).exec();
+
+      expect(firstPuppy).toBeDefined();
+
+      if (!firstPuppy) throw new Error('No puppies found');
+
+      const updatedPuppy = await service.update(firstPuppy._id.toString(), {
+        name: 'Buddy Jr.',
+        age: firstPuppy.age,
+        gender: firstPuppy.gender,
+        isVaccinated: firstPuppy.isVaccinated,
+        isNeutered: firstPuppy.isNeutered,
+        size: firstPuppy.size,
+        breed: firstPuppy.breed,
+        traits: firstPuppy.traits,
+        photoUrl: firstPuppy.photoUrl,
+      });
+
+      expect(updatedPuppy).toBeDefined();
+      if (!updatedPuppy) throw new Error('No puppy found');
+
+      expect(updatedPuppy.name).toBe('Buddy Jr.');
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a puppy', async () => {
+      const firstPuppy = await puppyModel.findOne({}).exec();
+
+      expect(firstPuppy).toBeDefined();
+
+      if (!firstPuppy) throw new Error('No puppies found');
+
+      const deletedPuppy = await service.delete(firstPuppy._id.toString());
+
+      expect(deletedPuppy).toBeDefined();
+      if (!deletedPuppy) throw new Error('No puppy found');
+
+      expect(deletedPuppy.name).toBe(firstPuppy.name);
     });
   });
 

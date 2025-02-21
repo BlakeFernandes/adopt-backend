@@ -49,6 +49,18 @@ export class PuppiesService {
     return this.puppyModel.findById(id).exec();
   }
 
+  async create(data: Puppy): Promise<Puppy> {
+    return this.puppyModel.create(data);
+  }
+
+  async delete(id: string): Promise<Puppy | null> {
+    return this.puppyModel.findByIdAndDelete(id).exec();
+  }
+
+  async update(id: string, data: Partial<Puppy>): Promise<Puppy | null> {
+    return this.puppyModel.findByIdAndUpdate(id, data, { new: true }).exec();
+  }
+
   async seedData(data: Puppy[]): Promise<void> {
     await this.puppyModel.deleteMany({});
     await this.puppyModel.insertMany(data);
