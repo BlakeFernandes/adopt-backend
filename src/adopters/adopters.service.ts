@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Adopters } from '../database/adopters.dto';
@@ -19,7 +19,7 @@ export class AdoptersService {
     message: string;
   }): Promise<Puppy | null> {
     const puppy = await this.puppyModel.findById(data.id).exec();
-    if (!puppy) return null;
+    if (!puppy) throw new NotFoundException('Puppy not found');
 
     await this.adoptersModel.create({
       name: data.name,
