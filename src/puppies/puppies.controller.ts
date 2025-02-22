@@ -27,14 +27,18 @@ import { FilterOptions, PuppiesService } from './puppies.service';
 export class FindAllDto {
   @IsOptional()
   search?: string;
+
   @IsOptional()
   breed?: string;
+
   @IsOptional()
   @IsInt()
   @Type(() => Number)
   age?: number;
+
   @IsOptional()
   size?: string;
+
   @IsOptional()
   gender?: string;
 }
@@ -44,22 +48,30 @@ export class CreatePuppyDto {
   @IsNotEmpty({ message: 'Name is required' })
   @Matches(/\S/, { message: 'Name cannot contain only spaces' })
   name: string;
+
   @IsNumber({}, { message: 'Age is required' })
   age: number;
+
   @IsEnum(['male', 'female', 'other'], { message: 'Gender is required' })
   gender: string;
+
   @IsBoolean({ message: 'Vaccination status is required' })
   isVaccinated: boolean;
+
   @IsBoolean({ message: 'Neutering status is required' })
   isNeutered: boolean;
+
   @IsEnum(['small', 'medium', 'large'], { message: 'Size is required' })
   size: string;
+
   @IsString({ message: 'Breed is required' })
   @IsNotEmpty({ message: 'Breed is required' })
   @Matches(/\S/, { message: 'Breed cannot contain only spaces' })
   breed: string;
+
   @IsOptional()
   traits: string[];
+
   @IsOptional()
   photoUrl: string;
 }

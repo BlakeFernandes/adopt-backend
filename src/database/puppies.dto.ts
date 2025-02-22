@@ -7,20 +7,28 @@ export type PuppyDocument = HydratedDocument<Puppy>;
 export class Puppy {
   @Prop({ required: true })
   name: string;
+
   @Prop()
   age: number;
+
   @Prop({ lowercase: true })
   gender: string;
+
   @Prop()
   isVaccinated: boolean;
+
   @Prop()
   isNeutered: boolean;
+
   @Prop({ lowercase: true })
   size: string;
+
   @Prop({ lowercase: true })
   breed: string;
+
   @Prop()
   traits: string[];
+
   @Prop()
   photoUrl: string;
 }
