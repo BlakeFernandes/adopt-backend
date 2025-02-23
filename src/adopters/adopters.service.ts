@@ -11,6 +11,17 @@ export class AdoptersService {
     @InjectModel(Adopters.name) private adoptersModel: Model<Adopters>,
   ) {}
 
+  /**
+   * Save the adopter's information along with the puppy ID they want to adopt.
+   *
+   * @param id The ID of the puppy to adopt
+   * @param name The name of the adopter
+   * @param email The email of the adopter
+   * @param phone The phone number of the adopter
+   * @param message The message from the adopter
+   * @returns The puppy that was adopted or null if the puppy was not found {@link Puppy}
+   * @throws NotFoundException if the puppy is not found
+   */
   async adopt(data: {
     id: string;
     name: string;

@@ -29,10 +29,18 @@ export class AdoptDto {
   message: string;
 }
 
-@Controller('adopt')
+@Controller('adopters')
 export class AdoptersController {
   constructor(private readonly adoptService: AdoptersService) {}
 
+  /**
+   * Save the adopter's information along with the puppy ID they want to adopt.
+   *
+   * @param id The ID of the puppy to adopt
+   * @param query The adopter's information {@link AdoptDto}
+   * @returns The puppy that was adopted or null if the puppy was not found {@link Puppy}
+   * @throws NotFoundException if the puppy is not found
+   */
   @Post(':id')
   @UsePipes(new ValidationPipe({ transform: true }))
   findAll(

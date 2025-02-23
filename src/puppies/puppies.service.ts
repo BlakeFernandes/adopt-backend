@@ -19,6 +19,12 @@ export type FilterOptions = {
 export class PuppiesService {
   constructor(@InjectModel(Puppy.name) private puppyModel: Model<Puppy>) {}
 
+  /**
+   * Find all puppies based on the search filter.
+   *
+   * @param filter The filter criteria for puppies {@link FindAllDto}
+   * @returns A list of puppies that match the search filter {@link Puppy[]}
+   */
   async findAll(filter: SearchFilter): Promise<Puppy[]> {
     const query: FilterQuery<Puppy> = {};
     const orConditions: FilterQuery<Puppy>[] = [];
@@ -40,27 +46,64 @@ export class PuppiesService {
     return this.puppyModel.find(query).exec();
   }
 
+  /**
+   * Get the filter options for puppies.
+   * e.g. possible breeds, sizes
+   *
+   * @returns The filter options for puppies {@link FilterOptions}
+   */
   async getFilters(): Promise<FilterOptions> {
     const breeds = await this.puppyModel.distinct('breed').exec();
     return { breeds };
   }
 
+  /**
+   * Find a puppy by ID.
+   *
+   * @param id The ID of the puppy to find
+   * @returns The puppy that was found or null if the puppy was not found {@link Puppy}
+   */
   async findOne(id: string): Promise<Puppy | null> {
     return this.puppyModel.findById(id).exec();
   }
 
+  /**
+   * Create a new puppy.
+   *
+   *
+   * @param data The puppy to create {@link Puppy}
+   * @returns The puppy that was created {@link Puppy}
+   */
   async create(data: Puppy): Promise<Puppy> {
     return this.puppyModel.create(data);
   }
 
+  /**
+   * Delete a puppy by ID.
+   *
+   * @param id The ID of the puppy to delete
+   * @returns The puppy that was deleted or null if the puppy was not found {@link Puppy}
+   */
   async delete(id: string): Promise<Puppy | null> {
     return this.puppyModel.findByIdAndDelete(id).exec();
   }
 
+  /**
+   * Update a puppy by ID.
+   *
+   * @param id The ID of the puppy to update
+   * @param data The puppy data to update {@link CreatePuppyDto}
+   * @returns The puppy that was updated or null if the puppy was not found {@link Puppy}
+   */
   async update(id: string, data: Partial<Puppy>): Promise<Puppy | null> {
     return this.puppyModel.findByIdAndUpdate(id, data, { new: true }).exec();
   }
 
+  /**
+   * Seed the database with the provided data.
+   *
+   * @param data The puppy list to seed the database with {@link Puppy[]}
+   */
   async seedData(data: Puppy[]): Promise<void> {
     await this.puppyModel.deleteMany({});
     await this.puppyModel.insertMany(data);
