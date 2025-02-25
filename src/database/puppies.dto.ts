@@ -3,33 +3,33 @@ import { HydratedDocument } from 'mongoose';
 
 export type PuppyDocument = HydratedDocument<Puppy>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Puppy {
-  @Prop({ required: true })
+  @Prop({ required: true, trim: true })
   name: string;
 
   @Prop()
   age: number;
 
-  @Prop({ lowercase: true })
+  @Prop({ required: true, enum: ['male', 'female', 'other'], lowercase: true })
   gender: string;
 
-  @Prop()
+  @Prop({ default: false })
   isVaccinated: boolean;
 
-  @Prop()
+  @Prop({ default: false })
   isNeutered: boolean;
 
-  @Prop({ lowercase: true })
+  @Prop({ required: true, enum: ['small', 'medium', 'large'], lowercase: true })
   size: string;
 
-  @Prop({ lowercase: true })
+  @Prop({ required: true, trim: true, lowercase: true })
   breed: string;
 
-  @Prop()
+  @Prop({ type: [String], default: [] })
   traits: string[];
 
-  @Prop()
+  @Prop({ trim: true, match: /^https?:\/\/.+\..+/ })
   photoUrl: string;
 }
 
