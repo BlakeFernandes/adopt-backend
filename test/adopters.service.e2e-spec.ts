@@ -3,14 +3,14 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Model, Types } from 'mongoose';
+import { Adopter, AdopterSchema } from '../src/database/adopter.dto';
+import { Puppy, PuppySchema } from '../src/database/puppy.dto';
 import { AdoptersService } from './../src/adopters/adopters.service';
-import { Adopters, AdoptersSchema } from './../src/database/adopters.dto';
-import { Puppy, PuppySchema } from './../src/database/puppies.dto';
 
 describe('AdoptersService', () => {
   let service: AdoptersService;
   let puppyModel: Model<Puppy>;
-  let adoptersModel: Model<Adopters>;
+  let adoptersModel: Model<Adopter>;
   let mongod: MongoMemoryServer;
   let module: TestingModule;
 
@@ -26,7 +26,7 @@ describe('AdoptersService', () => {
         }),
         MongooseModule.forFeature([{ name: Puppy.name, schema: PuppySchema }]),
         MongooseModule.forFeature([
-          { name: Adopters.name, schema: AdoptersSchema },
+          { name: Adopter.name, schema: AdopterSchema },
         ]),
       ],
       providers: [AdoptersService],
@@ -34,7 +34,7 @@ describe('AdoptersService', () => {
 
     service = module.get<AdoptersService>(AdoptersService);
     puppyModel = module.get<Model<Puppy>>(getModelToken(Puppy.name));
-    adoptersModel = module.get<Model<Adopters>>(getModelToken(Adopters.name));
+    adoptersModel = module.get<Model<Adopter>>(getModelToken(Adopter.name));
   });
 
   afterAll(async () => {

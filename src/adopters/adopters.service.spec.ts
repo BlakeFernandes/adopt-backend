@@ -1,6 +1,6 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Adopters } from 'src/database/adopters.dto';
+import { Adopter } from 'src/database/adopter.dto';
 import { AdoptersService } from './adopters.service';
 
 describe('AdoptersService', () => {
@@ -18,7 +18,7 @@ describe('AdoptersService', () => {
       providers: [
         AdoptersService,
         { provide: getModelToken('Puppy'), useValue: mockedPuppyModel },
-        { provide: getModelToken('Adopters'), useValue: mockedAdoptersModel },
+        { provide: getModelToken('Adopter'), useValue: mockedAdoptersModel },
       ],
     }).compile();
 
@@ -31,7 +31,7 @@ describe('AdoptersService', () => {
 
   describe('adopt', () => {
     it('should add a new adopter', async () => {
-      const mockAdoptResponse: Adopters = {
+      const mockAdoptResponse: Adopter = {
         name: 'John Doe',
         email: 'john@doe.co.nz',
         phone: '1234567890',

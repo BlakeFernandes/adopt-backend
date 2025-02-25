@@ -1,15 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Adopters } from '../database/adopters.dto';
-import { Puppy } from '../database/puppies.dto';
+import { Adopter } from '../database/adopter.dto';
+import { Puppy } from '../database/puppy.dto';
 import { AdoptDto } from './adopters.controller';
 
 @Injectable()
 export class AdoptersService {
   constructor(
     @InjectModel(Puppy.name) private puppyModel: Model<Puppy>,
-    @InjectModel(Adopters.name) private adoptersModel: Model<Adopters>,
+    @InjectModel(Adopter.name) private adoptersModel: Model<Adopter>,
   ) {}
 
   /**
@@ -23,7 +23,7 @@ export class AdoptersService {
    * @returns The puppy that was adopted or null if the puppy was not found {@link Puppy}
    * @throws NotFoundException if the puppy is not found
    */
-  async adopt(data: AdoptDto): Promise<Adopters> {
+  async adopt(data: AdoptDto): Promise<Adopter> {
     const puppy = await this.puppyModel.findById(data.puppyId).exec();
     if (!puppy) throw new NotFoundException('Puppy not found');
 

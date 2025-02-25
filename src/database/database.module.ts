@@ -1,15 +1,13 @@
 import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Puppy, PuppySchema } from '../database/puppies.dto';
-import { Adopters, AdoptersSchema } from './adopters.dto';
+import { Adopter, AdopterSchema } from './adopter.dto';
+import { Puppy, PuppySchema } from './puppy.dto';
 
 @Global()
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Puppy.name, schema: PuppySchema }]),
-    MongooseModule.forFeature([
-      { name: Adopters.name, schema: AdoptersSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Adopter.name, schema: AdopterSchema }]),
   ],
   exports: [MongooseModule],
 })

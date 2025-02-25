@@ -19,7 +19,7 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { Puppy } from '../database/puppies.dto';
+import { Puppy } from '../database/puppy.dto';
 import { FilterOptions, FindAllPuppy, PuppiesService } from './puppies.service';
 
 export class FindAllDto {

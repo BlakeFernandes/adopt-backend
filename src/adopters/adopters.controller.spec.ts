@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Adopters } from 'src/database/adopters.dto';
+import { Adopter } from 'src/database/adopter.dto';
 import { AdoptDto, AdoptersController } from './adopters.controller';
 import { AdoptersService } from './adopters.service';
 
@@ -7,7 +7,7 @@ describe('AdoptersController', () => {
   let controller: AdoptersController;
 
   const mockAdoptersService = {
-    adopt: jest.fn<Promise<Adopters>, AdoptDto[]>().mockImplementation((dto) =>
+    adopt: jest.fn<Promise<Adopter>, AdoptDto[]>().mockImplementation((dto) =>
       Promise.resolve({
         id: '1',
         ...dto,
