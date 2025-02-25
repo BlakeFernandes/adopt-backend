@@ -6,7 +6,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
-import { Puppy } from 'src/database/puppies.dto';
+import { Adopters } from 'src/database/adopters.dto';
 import { AdoptersService } from './adopters.service';
 
 export class AdoptDto {
@@ -50,7 +50,7 @@ export class AdoptersController {
    */
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  findAll(@Body() query: AdoptDto): Promise<Puppy | null> {
+  findAll(@Body() query: AdoptDto): Promise<Adopters> {
     return this.adoptService.adopt({
       id: query.id,
       name: query.name,

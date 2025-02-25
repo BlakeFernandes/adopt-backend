@@ -28,11 +28,11 @@ export class AdoptersService {
     email: string;
     phone: string;
     message: string;
-  }): Promise<Puppy | null> {
+  }): Promise<Adopters> {
     const puppy = await this.puppyModel.findById(data.id).exec();
     if (!puppy) throw new NotFoundException('Puppy not found');
 
-    await this.adoptersModel.create({
+    const adopter = await this.adoptersModel.create({
       name: data.name,
       email: data.email,
       phone: data.phone,
@@ -40,6 +40,6 @@ export class AdoptersService {
       puppyId: data.id,
     });
 
-    return puppy;
+    return adopter;
   }
 }

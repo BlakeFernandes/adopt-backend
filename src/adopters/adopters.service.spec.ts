@@ -81,19 +81,13 @@ describe('AdoptersService', () => {
 
       if (!firstPuppy) throw new Error('No puppies found');
 
-      const puppy = await service.adopt({
+      const adopter = await service.adopt({
         id: firstPuppy._id.toString(),
         name: 'John Doe',
         email: 'john@doe.co.nz',
         phone: '1234567890',
         message: 'I want to adopt this puppy',
       });
-
-      expect(puppy).toBeDefined();
-
-      const adopter = await adoptersModel
-        .findOne({ puppyId: firstPuppy._id })
-        .exec();
 
       expect(adopter).toBeDefined();
       expect(adopter?.name).toBe('John Doe');
