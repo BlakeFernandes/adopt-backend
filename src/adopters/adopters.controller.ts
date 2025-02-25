@@ -13,7 +13,7 @@ export class AdoptDto {
   @IsString({ message: 'Puppy ID should be a string' })
   @IsNotEmpty({ message: 'Puppy ID cannot be empty' })
   @Matches(/\S/, { message: 'Puppy ID cannot contain only spaces' })
-  id: string;
+  puppyId: string;
 
   @IsString({ message: 'Name should be a string' })
   @IsNotEmpty({ message: 'Name cannot be empty' })
@@ -50,13 +50,7 @@ export class AdoptersController {
    */
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
-  findAll(@Body() query: AdoptDto): Promise<Adopters> {
-    return this.adoptService.adopt({
-      id: query.id,
-      name: query.name,
-      email: query.email,
-      phone: query.phone,
-      message: query.message,
-    });
+  adopt(@Body() query: AdoptDto): Promise<Adopters> {
+    return this.adoptService.adopt(query);
   }
 }

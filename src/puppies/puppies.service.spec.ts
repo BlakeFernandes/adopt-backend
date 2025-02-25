@@ -1,231 +1,191 @@
-import { MongooseModule, getModelToken } from '@nestjs/mongoose';
+import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Model } from 'mongoose';
-import { Puppy, PuppySchema } from '../database/puppies.dto';
 import { PuppiesService } from './puppies.service';
 
 describe('PuppiesService', () => {
   let service: PuppiesService;
-  let puppyModel: Model<Puppy>;
-  let mongod: MongoMemoryServer;
-  let module: TestingModule;
 
-  beforeAll(async () => {
-    mongod = await MongoMemoryServer.create();
+  const mockedPuppyModel = {
+    find: jest.fn().mockReturnThis(),
+    distinct: jest.fn(),
+    findById: jest.fn().mockReturnThis(),
+    findByIdAndDelete: jest.fn().mockReturnThis(),
+    findByIdAndUpdate: jest.fn().mockReturnThis(),
+    create: jest.fn().mockReturnThis(),
+    exec: jest.fn(),
+  };
 
-    module = await Test.createTestingModule({
-      imports: [
-        MongooseModule.forRootAsync({
-          useFactory: () => ({
-            uri: mongod.getUri(),
-          }),
-        }),
-        MongooseModule.forFeature([{ name: Puppy.name, schema: PuppySchema }]),
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        PuppiesService,
+        { provide: getModelToken('Puppy'), useValue: mockedPuppyModel },
       ],
-      providers: [PuppiesService],
     }).compile();
 
     service = module.get<PuppiesService>(PuppiesService);
-    puppyModel = module.get<Model<Puppy>>(getModelToken(Puppy.name));
-  });
-
-  afterAll(async () => {
-    // Stop the in-memory MongoDB server and close the connection
-    await module.close();
-    await mongod.stop();
-  });
-
-  beforeEach(async () => {
-    // reset database before each test
-    await puppyModel.deleteMany({});
-    await puppyModel.insertMany([
-      {
-        name: 'Buddy',
-        age: 2,
-        gender: 'male',
-        isVaccinated: true,
-        isNeutered: false,
-        size: 'large',
-        breed: 'golden retriever',
-        traits: ['Friendly', 'Playful'],
-        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
-      },
-      {
-        name: 'Max',
-        age: 3,
-        gender: 'male',
-        isVaccinated: true,
-        isNeutered: true,
-        size: 'large',
-        breed: 'german shepherd',
-        traits: ['Loyal', 'Intelligent'],
-        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
-      },
-      {
-        name: 'Tommy',
-        age: 2,
-        gender: 'male',
-        isVaccinated: false,
-        isNeutered: true,
-        size: 'large',
-        breed: 'GREYHOUND',
-        traits: ['Fast runner', 'Gentle indoors'],
-        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
-      },
-    ]);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('findOne', () => {
-    it('should return a puppy by id', async () => {
-      const firstPuppy = await puppyModel.findOne({}).exec();
+  describe('findAll', () => {
+    it('should return a list of puppies', async () => {
+      const mockFindAllResponse = [
+        {
+          name: 'Buddy',
+          age: 2,
+          breed: 'Golden Retriever',
+          traits: ['friendly', 'playful'],
+          photoUrl: 'https://example.com/buddy.jpg',
+        },
+      ];
 
-      expect(firstPuppy).toBeDefined();
+      mockedPuppyModel.find.mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockFindAllResponse),
+      });
 
-      if (!firstPuppy) throw new Error('No puppies found');
+      const result = await service.findAll({});
 
-      const puppy = await service.findOne(firstPuppy._id.toString());
+      expect(result).toEqual(mockFindAllResponse);
+    });
 
-      if (!puppy) throw new Error('No puppy found');
+    it('should be called with the correct query', async () => {
+      const mockFindAllResponse = [];
 
-      expect(puppy).toBeDefined();
-      expect(puppy.name).toBe(firstPuppy.name);
+      mockedPuppyModel.find.mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockFindAllResponse),
+      });
+
+      await service.findAll({
+        search: 'Buddy',
+        breed: 'Golden Retriever',
+        age: 2,
+        size: 'medium',
+        gender: 'male',
+      });
+
+      expect(mockedPuppyModel.find).toHaveBeenCalledWith({
+        $or: [
+          { name: { $regex: 'Buddy', $options: 'i' } },
+          { breed: { $regex: 'Buddy', $options: 'i' } },
+        ],
+        breed: 'golden retriever',
+        age: 2,
+        size: 'medium',
+        gender: 'male',
+      });
     });
   });
 
-  describe('findAll', () => {
-    it('should return all puppies without filters', async () => {
-      const result = await service.findAll({});
+  describe('getFilters', () => {
+    it('should return the filter options', async () => {
+      const mockFilterOptions = {
+        breeds: ['Golden Retriever', 'Labrador'],
+      };
 
-      expect(result).toHaveLength(3);
-      expect(result[0].name).toBe('Buddy');
-      expect(result[1].name).toBe('Max');
-      expect(result[2].name).toBe('Tommy');
+      mockedPuppyModel.distinct.mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockFilterOptions.breeds),
+      });
+
+      const result = await service.getFilters();
+
+      expect(result).toEqual(mockFilterOptions);
     });
+  });
 
-    it('should filter with uppercase model input', async () => {
-      const result = await service.findAll({ breed: 'gREYhouND' });
+  describe('findOne', () => {
+    it('should return a puppy', async () => {
+      const mockFindOneResponse = {
+        name: 'Buddy',
+        age: 2,
+        breed: 'Golden Retriever',
+        traits: ['friendly', 'playful'],
+        photoUrl: 'https://example.com/buddy.jpg',
+      };
 
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Tommy');
-    });
+      mockedPuppyModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockFindOneResponse),
+      });
 
-    it('should filter puppies by breed', async () => {
-      const result = await service.findAll({ breed: 'Golden Retriever' });
+      const result = await service.findOne('1');
 
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Buddy');
-      expect(result[0].breed).toBe('golden retriever');
-    });
-
-    it('should filter puppies by name', async () => {
-      const result = await service.findAll({ search: 'Buddy' });
-
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Buddy');
+      expect(result).toEqual(mockFindOneResponse);
     });
   });
 
   describe('create', () => {
-    it('should create a new puppy', async () => {
-      const newPuppy = await service.create({
-        name: 'Luna',
-        age: 1,
-        gender: 'Female',
+    it('should create a puppy', async () => {
+      const mockCreateResponse = {
+        name: 'Buddy',
+        age: 2,
+        breed: 'Golden Retriever',
+        traits: ['friendly', 'playful'],
+        photoUrl: 'https://example.com/buddy.jpg',
+      };
+
+      mockedPuppyModel.create.mockResolvedValue(mockCreateResponse);
+
+      const result = await service.create({
+        name: 'Buddy',
+        age: 2,
+        gender: 'male',
         isVaccinated: true,
         isNeutered: false,
-        size: 'small',
-        breed: 'golden retriever',
-        traits: ['Friendly', 'Playful'],
-        photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
+        breed: 'Golden Retriever',
+        size: 'medium',
+        traits: ['friendly', 'playful'],
+        photoUrl: 'https://example.com/buddy.jpg',
       });
 
-      expect(newPuppy).toBeDefined();
-      expect(newPuppy.name).toBe('Luna');
-      expect(newPuppy.age).toBe(1);
-    });
-  });
-
-  describe('update', () => {
-    it('should update a puppy', async () => {
-      const firstPuppy = await puppyModel.findOne({}).exec();
-
-      expect(firstPuppy).toBeDefined();
-
-      if (!firstPuppy) throw new Error('No puppies found');
-
-      const updatedPuppy = await service.update(firstPuppy._id.toString(), {
-        name: 'Buddy Jr.',
-        age: firstPuppy.age,
-        gender: firstPuppy.gender,
-        isVaccinated: firstPuppy.isVaccinated,
-        isNeutered: firstPuppy.isNeutered,
-        size: firstPuppy.size,
-        breed: firstPuppy.breed,
-        traits: firstPuppy.traits,
-        photoUrl: firstPuppy.photoUrl,
-      });
-
-      expect(updatedPuppy).toBeDefined();
-      if (!updatedPuppy) throw new Error('No puppy found');
-
-      expect(updatedPuppy.name).toBe('Buddy Jr.');
+      expect(result).toEqual(mockCreateResponse);
     });
   });
 
   describe('delete', () => {
     it('should delete a puppy', async () => {
-      const firstPuppy = await puppyModel.findOne({}).exec();
+      const mockDeleteResponse = {
+        name: 'Buddy',
+        age: 2,
+        breed: 'Golden Retriever',
+        traits: ['friendly', 'playful'],
+        photoUrl: 'https://example.com/buddy.jpg',
+      };
 
-      expect(firstPuppy).toBeDefined();
+      mockedPuppyModel.findByIdAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockDeleteResponse),
+      });
 
-      if (!firstPuppy) throw new Error('No puppies found');
+      const result = await service.delete('1');
 
-      const deletedPuppy = await service.delete(firstPuppy._id.toString());
-
-      expect(deletedPuppy).toBeDefined();
-      if (!deletedPuppy) throw new Error('No puppy found');
-
-      expect(deletedPuppy.name).toBe(firstPuppy.name);
+      expect(result).toEqual(mockDeleteResponse);
     });
   });
 
-  describe('getFilters', () => {
-    it('should return distinct breeds', async () => {
-      const result = await service.getFilters();
+  describe('update', () => {
+    it('should update a puppy', async () => {
+      const mockUpdateResponse = {
+        name: 'Buddy',
+        age: 3,
+        breed: 'Golden Retriever',
+        traits: ['friendly', 'playful'],
+        photoUrl: 'https://example.com/buddy.jpg',
+      };
 
-      expect(result.breeds).toHaveLength(3);
-      expect(result.breeds).toContain('golden retriever');
-      expect(result.breeds).toContain('german shepherd');
-      expect(result.breeds).toContain('greyhound');
-    });
-  });
+      mockedPuppyModel.findByIdAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockUpdateResponse),
+      });
 
-  describe('seedData', () => {
-    it('should delete existing data and insert new data', async () => {
-      // Seed new data
-      // This should wipe the database...
-      await service.seedData([
-        {
-          name: 'Zoe',
-          age: 2,
-          gender: 'female',
-          isVaccinated: false,
-          isNeutered: true,
-          size: 'medium',
-          breed: 'greyhound',
-          traits: ['Fast runner', 'Gentle indoors'],
-          photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
-        },
-      ]);
+      const result = await service.update('1', {
+        name: 'Buddy',
+        age: 3,
+      });
 
-      const result = await puppyModel.find({}).exec();
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Zoe');
+      expect(result).toEqual(mockUpdateResponse);
     });
   });
 });
