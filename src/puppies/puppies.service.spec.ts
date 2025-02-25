@@ -44,6 +44,8 @@ describe('PuppiesService', () => {
 
       mockedPuppyModel.find.mockReturnValue({
         select: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockFindAllResponse),
       });
 
@@ -57,6 +59,8 @@ describe('PuppiesService', () => {
 
       mockedPuppyModel.find.mockReturnValue({
         select: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockFindAllResponse),
       });
 

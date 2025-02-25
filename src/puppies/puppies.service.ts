@@ -2,14 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
 import { Puppy } from '../database/puppy.dto';
-
-export type SearchFilter = {
-  search?: string;
-  breed?: string;
-  age?: number;
-  size?: string;
-  gender?: string;
-};
+import { FindAllDto } from './puppies.controller';
 
 export type FilterOptions = {
   breeds: string[];
@@ -30,7 +23,7 @@ export class PuppiesService {
    * @param filter The filter criteria for puppies {@link FindAllDto}
    * @returns A list of puppies (partial) that match the search filter {@link FindAllPuppy[]}
    */
-  async findAll(filter: SearchFilter): Promise<FindAllPuppy[]> {
+  async findAll(filter: FindAllDto): Promise<FindAllPuppy[]> {
     const query: FilterQuery<Puppy> = {};
     const orConditions: FilterQuery<Puppy>[] = [];
 
@@ -51,6 +44,8 @@ export class PuppiesService {
     return this.puppyModel
       .find(query)
       .select('name age breed traits photoUrl')
+      .skip(((filter.page ?? 1) - 1) * 20)
+      .limit(20)
       .exec();
   }
 

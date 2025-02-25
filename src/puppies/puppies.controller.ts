@@ -39,6 +39,9 @@ export class FindAllDto {
 
   @IsOptional()
   gender?: string;
+
+  @IsOptional()
+  page?: number;
 }
 
 export class CreatePuppyDto {
