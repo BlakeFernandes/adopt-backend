@@ -15,6 +15,11 @@ export type FilterOptions = {
   breeds: string[];
 };
 
+export type FindAllPuppy = Pick<
+  Puppy,
+  'name' | 'age' | 'breed' | 'traits' | 'photoUrl'
+>;
+
 @Injectable()
 export class PuppiesService {
   constructor(@InjectModel(Puppy.name) private puppyModel: Model<Puppy>) {}
@@ -23,9 +28,9 @@ export class PuppiesService {
    * Find all puppies based on the search filter.
    *
    * @param filter The filter criteria for puppies {@link FindAllDto}
-   * @returns A list of puppies that match the search filter {@link Puppy[]}
+   * @returns A list of puppies (partial) that match the search filter {@link FindAllPuppy[]}
    */
-  async findAll(filter: SearchFilter): Promise<Puppy[]> {
+  async findAll(filter: SearchFilter): Promise<FindAllPuppy[]> {
     const query: FilterQuery<Puppy> = {};
     const orConditions: FilterQuery<Puppy>[] = [];
 
@@ -43,7 +48,10 @@ export class PuppiesService {
 
     if (orConditions.length > 0) query.$or = orConditions;
 
-    return this.puppyModel.find(query).exec();
+    return this.puppyModel
+      .find(query)
+      .select('name age breed traits photoUrl')
+      .exec();
   }
 
   /**

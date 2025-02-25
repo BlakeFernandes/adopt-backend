@@ -12,17 +12,15 @@ import {
 } from '@nestjs/common';
 import { Type } from 'class-transformer';
 import {
-  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   Matches,
 } from 'class-validator';
 import { Puppy } from '../database/puppies.dto';
-import { FilterOptions, PuppiesService } from './puppies.service';
+import { FilterOptions, FindAllPuppy, PuppiesService } from './puppies.service';
 
 export class FindAllDto {
   @IsOptional()
@@ -44,28 +42,28 @@ export class FindAllDto {
 }
 
 export class CreatePuppyDto {
-  @IsString({ message: 'Name is required' })
-  @IsNotEmpty({ message: 'Name is required' })
+  @IsString({ message: 'Name should be a string' })
+  @IsNotEmpty({ message: 'Name cannot be empty' })
   @Matches(/\S/, { message: 'Name cannot contain only spaces' })
   name: string;
 
-  @IsNumber({}, { message: 'Age is required' })
+  @IsInt({ message: 'Age cannot be empty, should be an integer' })
   age: number;
 
   @IsEnum(['male', 'female', 'other'], { message: 'Gender is required' })
   gender: string;
 
-  @IsBoolean({ message: 'Vaccination status is required' })
+  @IsOptional()
   isVaccinated: boolean;
 
-  @IsBoolean({ message: 'Neutering status is required' })
+  @IsOptional()
   isNeutered: boolean;
 
   @IsEnum(['small', 'medium', 'large'], { message: 'Size is required' })
   size: string;
 
-  @IsString({ message: 'Breed is required' })
-  @IsNotEmpty({ message: 'Breed is required' })
+  @IsString({ message: 'Breed should be a string' })
+  @IsNotEmpty({ message: 'Breed cannot be empty' })
   @Matches(/\S/, { message: 'Breed cannot contain only spaces' })
   breed: string;
 
@@ -88,7 +86,7 @@ export class PuppiesController {
    */
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
-  findAll(@Query() query: FindAllDto): Promise<Puppy[]> {
+  findAll(@Query() query: FindAllDto): Promise<FindAllPuppy[]> {
     return this.puppiesService.findAll(query);
   }
 
