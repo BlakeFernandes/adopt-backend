@@ -95,29 +95,33 @@ describe('PuppiesService', () => {
   describe('findAll', () => {
     it('should return all puppies without filters', async () => {
       const result = await service.findAll({});
-      expect(result).toHaveLength(3);
-      expect(result[0].name).toBe('Buddy');
-      expect(result[1].name).toBe('Max');
-      expect(result[2].name).toBe('Tommy');
+      expect(result.puppies).toHaveLength(3);
+      expect(result.puppies[0].name).toBe('Buddy');
+      expect(result.puppies[1].name).toBe('Max');
+      expect(result.puppies[2].name).toBe('Tommy');
+      expect(result.lastPage).toBe(1);
     });
 
     it('should filter with uppercase model input', async () => {
       const result = await service.findAll({ breed: 'gREYhouND' });
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Tommy');
+      expect(result.puppies).toHaveLength(1);
+      expect(result.puppies[0].name).toBe('Tommy');
+      expect(result.lastPage).toBe(1);
     });
 
     it('should filter puppies by breed', async () => {
       const result = await service.findAll({ breed: 'Golden Retriever' });
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Buddy');
-      expect(result[0].breed).toBe('golden retriever');
+      expect(result.puppies).toHaveLength(1);
+      expect(result.puppies[0].name).toBe('Buddy');
+      expect(result.puppies[0].breed).toBe('golden retriever');
+      expect(result.lastPage).toBe(1);
     });
 
     it('should filter puppies by name', async () => {
       const result = await service.findAll({ search: 'Buddy' });
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Buddy');
+      expect(result.puppies).toHaveLength(1);
+      expect(result.puppies[0].name).toBe('Buddy');
+      expect(result.lastPage).toBe(1);
     });
   });
 

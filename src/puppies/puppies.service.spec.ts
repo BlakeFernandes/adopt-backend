@@ -47,11 +47,17 @@ describe('PuppiesService', () => {
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockFindAllResponse),
+        countDocuments: jest
+          .fn()
+          .mockResolvedValue(Math.ceil(mockFindAllResponse.length / 20)),
       });
 
       const result = await service.findAll({});
 
-      expect(result).toEqual(mockFindAllResponse);
+      expect(result).toEqual({
+        puppies: mockFindAllResponse,
+        lastPage: 1,
+      });
     });
 
     it('should be called with the correct query', async () => {
@@ -62,6 +68,7 @@ describe('PuppiesService', () => {
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockFindAllResponse),
+        countDocuments: jest.fn().mockReturnThis(),
       });
 
       await service.findAll({
