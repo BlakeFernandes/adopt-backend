@@ -185,6 +185,8 @@ describe('PuppiesService', () => {
     it('should delete existing data and insert new data', async () => {
       // Seed new data
       // This should wipe the database...
+      process.env.NODE_ENV = 'development';
+
       await service.seedData([
         {
           name: 'Zoe',
@@ -198,10 +200,35 @@ describe('PuppiesService', () => {
           photoUrl: 'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
         },
       ]);
+      process.env.NODE_ENV = undefined;
 
       const result = await puppyModel.find({}).exec();
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('Zoe');
+    });
+
+    it('should should fail in production environment', async () => {
+      // Seed new data
+      // This should wipe the database...
+      process.env.NODE_ENV = 'production';
+
+      await expect(
+        service.seedData([
+          {
+            name: 'Zoe',
+            age: 2,
+            gender: 'female',
+            isVaccinated: false,
+            isNeutered: true,
+            size: 'medium',
+            breed: 'greyhound',
+            traits: ['Fast runner', 'Gentle indoors'],
+            photoUrl:
+              'https://images.dog.ceo/breeds/doberman/n02107142_4763.jpg',
+          },
+        ]),
+      ).rejects.toThrow('Cannot seed data in a non-development environment');
+      process.env.NODE_ENV = undefined;
     });
   });
 });

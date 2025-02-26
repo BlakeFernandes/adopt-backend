@@ -114,6 +114,10 @@ export class PuppiesService {
    * @param data The puppy list to seed the database with {@link Puppy[]}
    */
   async seedData(data: Puppy[]): Promise<void> {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new Error('Cannot seed data in a non-development environment');
+    }
+
     await this.puppyModel.deleteMany({});
     await this.puppyModel.insertMany(data);
   }
