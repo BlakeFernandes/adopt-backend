@@ -89,7 +89,7 @@ export class PuppiesController {
    */
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
-  findAll(@Query() query: FindAllDto): Promise<FindAllPuppy[]> {
+  findAll(@Query() query: FindAllDto): Promise<FindAllPuppy> {
     return this.puppiesService.findAll(query);
   }
 

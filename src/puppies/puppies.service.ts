@@ -8,10 +8,10 @@ export type FilterOptions = {
   breeds: string[];
 };
 
-export type FindAllPuppy = Pick<
-  Puppy,
-  'name' | 'age' | 'breed' | 'traits' | 'photoUrl'
->;
+export type FindAllPuppy = {
+  puppies: Pick<Puppy, 'name' | 'age' | 'breed' | 'traits' | 'photoUrl'>[];
+  lastPage: number;
+};
 
 @Injectable()
 export class PuppiesService {
@@ -23,7 +23,7 @@ export class PuppiesService {
    * @param filter The filter criteria for puppies {@link FindAllDto}
    * @returns A list of puppies (partial) that match the search filter {@link FindAllPuppy[]}
    */
-  async findAll(filter: FindAllDto): Promise<FindAllPuppy[]> {
+  async findAll(filter: FindAllDto): Promise<FindAllPuppy> {
     const query: FilterQuery<Puppy> = {};
     const orConditions: FilterQuery<Puppy>[] = [];
 
@@ -41,12 +41,18 @@ export class PuppiesService {
 
     if (orConditions.length > 0) query.$or = orConditions;
 
-    return this.puppyModel
+    const puppies = await this.puppyModel
       .find(query)
-      .select('name age breed traits photoUrl')
       .skip(((filter.page ?? 1) - 1) * 20)
       .limit(20)
       .exec();
+
+    const puppyLength = await this.puppyModel.find(query).countDocuments();
+
+    return {
+      puppies: puppies,
+      lastPage: Math.ceil(puppyLength / 20),
+    };
   }
 
   /**
